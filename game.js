@@ -11,8 +11,8 @@ class Game {
     this.canvas.style.left = '50%'; // move game screeb left/right
     this.canvas.style.transform = 'translate(-50%, -50%)';
     // image background
-    //this.canvas.style.background = 'url("sprites/background.png") no-repeat center center';
-    //this.canvas.style.backgroundSize = 'cover';
+    this.canvas.style.background = 'url("sprites/background.jpg") no-repeat center center';
+    this.canvas.style.backgroundSize = 'cover';
 
     this.basket = { x: this.canvas.width / 2, y: this.canvas.height - 100, width: 100, height: 50 };
     this.fruits = [];
