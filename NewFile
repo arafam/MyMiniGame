@@ -1,9 +1,0 @@
-Note for next implementaions:
-
-The game logic is complete. So, here’s a quick checklist:
-
-Images: Replace the placeholders (basket.png, fruit.png, grenade.png) with your actual image files. Make sure they’re in the same directory as your HTML and JavaScript files.
-Sounds: Replace the sound file placeholders (fruit.mp3, grenade.mp3, miss.mp3) with your sound files. These should also be in the same folder as the HTML and JS files.
-Once those assets are in place, everything should work smoothly. 
-
-

@@ -1,114 +1,180 @@
 class Game {
-    constructor() {
-      this.canvas = document.getElementById('gameCanvas');
-      this.ctx = this.canvas.getContext('2d');
-      this.canvas.width = window.innerWidth;
-      this.canvas.height = window.innerHeight;
-      this.basket = { x: this.canvas.width / 2, y: this.canvas.height - 100, width: 100, height: 50 };
-      this.fruits = [];
-      this.grenades = [];
-      this.score = 0;
-      this.speed = 2;
-      this.gameOver = false;
-      this.fruitSound = new Audio('fruit.mp3');
-      this.grenadeSound = new Audio('grenade.mp3');
-      this.missSound = new Audio('miss.mp3');
-      this.basketImg = new Image();
-      this.basketImg.src = 'basket.png';
-      this.fruitImg = new Image();
-      this.fruitImg.src = 'fruit.png';
-      this.grenadeImg = new Image();
-      this.grenadeImg.src = 'grenade.png';
-  
-      this.setupEvents();
-      this.gameLoop();
-    }
-  
-    setupEvents() {
-      document.addEventListener('mousemove', (e) => {
-        this.basket.x = e.clientX - this.basket.width / 2;
-      });
-    }
-  
-    gameLoop() {
-      if (this.gameOver) {
-        this.ctx.fillStyle = 'red';
-        this.ctx.font = '50px Arial';
-        this.ctx.fillText('Game Over!', this.canvas.width / 2 - 150, this.canvas.height / 2);
-        this.ctx.font = '30px Arial';
-        this.ctx.fillText(`Score: ${this.score}`, this.canvas.width / 2 - 80, this.canvas.height / 2 + 50);
-        return;
-      }
-  
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-  
-      this.drawBasket();
-      this.updateFruits();
-      this.updateGrenades();
-      this.updateSpeed();
-      this.updateScore();
-  
-      requestAnimationFrame(() => this.gameLoop());
-    }
-  
-    drawBasket() {
-      this.ctx.drawImage(this.basketImg, this.basket.x, this.basket.y, this.basket.width, this.basket.height);
-    }
-  
-    updateFruits() {
-      if (Math.random() < 0.02) {
-        this.fruits.push({ x: Math.random() * this.canvas.width, y: 0 });
-      }
-      this.fruits.forEach((fruit, index) => {
-        fruit.y += this.speed;
-        this.ctx.drawImage(this.fruitImg, fruit.x, fruit.y, 40, 40);
-  
-        if (fruit.y + 40 > this.basket.y && fruit.x + 40 > this.basket.x && fruit.x < this.basket.x + this.basket.width) {
-          this.fruits.splice(index, 1);
-          this.score++;
-          this.fruitSound.play();
-        }
-  
-        if (fruit.y > this.canvas.height) {
-          this.fruits.splice(index, 1);
-          this.missSound.play();
-        }
-      });
-    }
-  
-    updateGrenades() {
-      if (Math.random() < 0.01) {
-        this.grenades.push({ x: Math.random() * this.canvas.width, y: 0 });
-      }
-      this.grenades.forEach((grenade, index) => {
-        grenade.y += this.speed;
-        this.ctx.drawImage(this.grenadeImg, grenade.x, grenade.y, 40, 40);
-  
-        if (grenade.y + 40 > this.basket.y && grenade.x + 40 > this.basket.x && grenade.x < this.basket.x + this.basket.width) {
-          this.grenadeSound.play();
-          this.gameOver = true;
-        }
-  
-        if (grenade.y > this.canvas.height) {
-          this.grenades.splice(index, 1);
-        }
-      });
-    }
-  
-    updateSpeed() {
-      this.speed += 0.001;
-    }
-  
-    updateScore() {
-      this.ctx.fillStyle = 'black';
-      this.ctx.font = '30px Arial';
-      this.ctx.fillText(`Score: ${this.score}`, 20, 40);
-    }
+  constructor() {
+    this.canvas = document.getElementById('gameCanvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.canvas.width = window.innerWidth / 2;
+    this.canvas.height = window.innerHeight / 2;
+    this.canvas.style.position = 'absolute';
+    //this.canvas.width = window.innerWidth;   // makes game screen same size as window
+    //this.canvas.height = window.innerHeight; // makes game screen same size as window
+    this.canvas.style.top = '27%';  // moves game screen up/down
+    this.canvas.style.left = '50%'; // move game screeb left/right
+    this.canvas.style.transform = 'translate(-50%, -50%)';
+    // image background
+    //this.canvas.style.background = 'url("sprites/background.png") no-repeat center center';
+    //this.canvas.style.backgroundSize = 'cover';
+
+    this.basket = { x: this.canvas.width / 2, y: this.canvas.height - 100, width: 100, height: 50 };
+    this.fruits = [];
+    this.grenades = [];
+    this.score = 0;
+    this.speed = 2;
+    this.gameOver = false;
+
+    this.fruitImages = [
+      "sprites/blueberry.png", "sprites/cherry.png", "sprites/grape.png",
+      "sprites/green_apple.png", "sprites/orange.png", "sprites/pear.png",
+      "sprites/pepper.png", "sprites/pumpkin.png", "sprites/red_apple.png",
+      "sprites/strawberry.png", "sprites/tomato.png", "sprites/grenade.png"
+    ];
+
+    this.fruitSound = new Audio('audios/pop.mp3');
+    this.grenadeSound = new Audio('audios/fruit_lost.mp3');
+    this.missSound = new Audio('audios/fruit_lost.mp3');
+    //this.backgroundMusic = new Audio('audios/ShanghaiActionLoop.mp3');
+    this.backgroundMusic = new Audio('audios/ShanghaiActionEnd.mp3');
+
+    this.basketImg = new Image();
+    this.basketImg.src = 'sprites/basket.png';
+
+    this.grenadeImg = new Image();
+    this.grenadeImg.src = 'sprites/grenade.png';
+
+    this.setupEvents();
+    this.createRestartButton();
+    this.startBackgroundMusic();
+    this.gameLoop();
   }
-  
-  new Game();
 
-  
+  setupEvents() {
+    document.addEventListener('mousemove', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      this.basket.x = e.clientX - rect.left - this.basket.width / 2;
+    });
+  }
+
+  createRestartButton() {
+    const button = document.createElement('button');
+    button.innerText = 'New Game';
+    button.style.position = 'absolute';
+    button.style.top = '37%';   // moves "new game" up/down
+    button.style.left = '49%';  // moves "new game" left/right
+    button.style.transform = 'translate(-50%, -50%)';
+    button.style.padding = '10px 20px';
+    button.style.fontSize = '20px';
+    button.style.display = 'none';
+    button.id = 'restartButton';
+    document.body.appendChild(button);
+
+    button.addEventListener('click', () => {
+      this.resetGame();
+      button.style.display = 'none';
+    });
+  }
+
+  showRestartButton() {
+    const button = document.getElementById('restartButton');
+    button.style.display = 'block';
+  }
+
+  resetGame() {
+    this.fruits = [];
+    this.grenades = [];
+    this.score = 0;
+    this.speed = 2;
+    this.gameOver = false;
+    this.backgroundMusic.currentTime = 0;
+    this.backgroundMusic.play();
+    this.gameLoop();
+  }
+
+  startBackgroundMusic() {
+    this.backgroundMusic.loop = true;
+    this.backgroundMusic.volume = 0.5;
+    this.backgroundMusic.play();
+  }
+
+  gameLoop() {
+    if (this.gameOver) {
+      this.ctx.fillStyle = 'red';
+      this.ctx.font = '50px Arial';
+      this.ctx.fillText('Game Over!', this.canvas.width / 2 - 150, this.canvas.height / 2);
+      this.ctx.font = '30px Arial';
+      this.ctx.fillText(`Score: ${this.score}`, this.canvas.width / 2 - 80, this.canvas.height / 2 + 50);
+      this.showRestartButton();
+      return;
+    }
+
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.drawBasket();
+    this.updateFruits();
+    this.updateGrenades();
+    this.updateSpeed();
+    this.updateScore();
+
+    requestAnimationFrame(() => this.gameLoop());
+  }
+
+  drawBasket() {
+    this.ctx.drawImage(this.basketImg, this.basket.x, this.basket.y, this.basket.width, this.basket.height);
+  }
+
+  updateFruits() {
+    if (Math.random() < 0.02) {
+      const fruitImage = new Image();
+      fruitImage.src = this.fruitImages[Math.floor(Math.random() * this.fruitImages.length)];
+      this.fruits.push({ x: Math.random() * this.canvas.width, y: 0, img: fruitImage });
+    }
+    this.fruits.forEach((fruit, index) => {
+      fruit.y += this.speed;
+      this.ctx.drawImage(fruit.img, fruit.x, fruit.y, 40, 40);
+
+      if (fruit.y + 40 > this.basket.y && fruit.x + 40 > this.basket.x && fruit.x < this.basket.x + this.basket.width) {
+        this.fruits.splice(index, 1);
+        this.score++;
+        this.fruitSound.play();
+      }
+
+      if (fruit.y > this.canvas.height) {
+        this.fruits.splice(index, 1);
+        this.missSound.play();
+      }
+    });
+  }
+
+  updateGrenades() {
+    if (Math.random() < 0.01) {
+      this.grenades.push({ x: Math.random() * this.canvas.width, y: 0 });
+    }
+    this.grenades.forEach((grenade, index) => {
+      grenade.y += this.speed;
+      this.ctx.drawImage(this.grenadeImg, grenade.x, grenade.y, 40, 40);
+
+      if (grenade.y + 40 > this.basket.y && grenade.x + 40 > this.basket.x && grenade.x < this.basket.x + this.basket.width) {
+        this.grenadeSound.play();
+        this.gameOver = true;
+      }
+
+      if (grenade.y > this.canvas.height) {
+        this.grenades.splice(index, 1);
+      }
+    });
+  }
+
+  updateSpeed() {
+    this.speed += 0.001;
+  }
+
+  updateScore() {
+    this.ctx.fillStyle = 'black';
+    this.ctx.font = '30px Arial';
+    this.ctx.fillText(`Score: ${this.score}`, 20, 40);
+  }
+}
+
+new Game();
 
 
-  
+
+

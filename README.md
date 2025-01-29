@@ -1,2 +1,2 @@
 
-Simple mini game for js class.
+Simple mini game for js class by Arafa
