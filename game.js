@@ -33,9 +33,8 @@ class Game {
     ];
 
     this.fruitSound = new Audio('audios/pop.mp3');
-    this.grenadeSound = new Audio('audios/fruit_lost.mp3');
+    this.grenadeSound = new Audio('audios/explosion.wav');
     this.missSound = new Audio('audios/fruit_lost.mp3');
-    //this.backgroundMusic = new Audio('audios/ShanghaiActionLoop.mp3');
     this.backgroundMusic = new Audio('audios/ShanghaiActionEnd.mp3');
 
     this.basketImg = new Image();
