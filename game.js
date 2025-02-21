@@ -86,7 +86,7 @@ class Game {
   }
 
   startBackgroundMusic() {
-    this.backgroundMusic = new Audio('audios/ShanghaiActionEnd  .mp3');
+    this.backgroundMusic = new Audio('audios/ShanghaiActionEnd.mp3');
     this.backgroundMusic.loop = true;
     this.backgroundMusic.volume = 0.5;
     this.backgroundMusic.play();
