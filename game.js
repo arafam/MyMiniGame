@@ -85,13 +85,26 @@ class Game {
     });
   }
 
+  // startBackgroundMusic() {
+  //   this.backgroundMusic = new Audio('audios/ShanghaiActionEnd.mp3');
+  //   this.backgroundMusic.loop = true;
+  //   this.backgroundMusic.volume = 0.5;
+  //   this.backgroundMusic.play();
+  // }
   startBackgroundMusic() {
     this.backgroundMusic = new Audio('audios/ShanghaiActionEnd.mp3');
     this.backgroundMusic.loop = true;
     this.backgroundMusic.volume = 0.5;
-    this.backgroundMusic.play();
+    const playMusic = () => {
+        this.backgroundMusic.play().then(() => {
+            document.removeEventListener('click', playMusic);
+            document.removeEventListener('keydown', playMusic);
+        }).catch(error => console.log('Audio play blocked:', error));
+    };
+    document.addEventListener('click', playMusic);
+    document.addEventListener('keydown', playMusic);
   }
-
+ 
   changeLevel(levelNumber) {
     if (levelNumber === 1) {
       this.currentLevel = this.level1;
