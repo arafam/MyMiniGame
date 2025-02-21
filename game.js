@@ -85,24 +85,11 @@ class Game {
     });
   }
 
-  // startBackgroundMusic() {
-  //   this.backgroundMusic = new Audio('audios/ShanghaiActionEnd.mp3');
-  //   this.backgroundMusic.loop = true;
-  //   this.backgroundMusic.volume = 0.5;
-  //   this.backgroundMusic.play();
-  // }
   startBackgroundMusic() {
     this.backgroundMusic = new Audio('audios/ShanghaiActionEnd.mp3');
     this.backgroundMusic.loop = true;
     this.backgroundMusic.volume = 0.5;
-    const playMusic = () => {
-        this.backgroundMusic.play().then(() => {
-            document.removeEventListener('click', playMusic); 
-            document.removeEventListener('keydown', playMusic);
-        }).catch(error => console.log('Audio play blocked:', error));
-    };
-    document.addEventListener('click', playMusic);
-    document.addEventListener('keydown', playMusic);
+    this.backgroundMusic.play();
   }
 
   changeLevel(levelNumber) {
@@ -146,7 +133,7 @@ class Game {
     this.updateLeaderboard();
     requestAnimationFrame(() => this.gameLoop());
   }
-  
+
 }
 
 
