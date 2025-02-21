@@ -1,4 +1,4 @@
 
-Simple mini game for js class by Arafa
+Simple mini game I made for js class
 
 https://arafam.github.io/MyMiniGame/
