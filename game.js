@@ -1,214 +1,144 @@
+// ==== Game Class: Main Orchestrator ====
 class Game {
   constructor() {
+    // Canvas setup
     this.canvas = document.getElementById('gameCanvas');
     this.ctx = this.canvas.getContext('2d');
-    //this.canvas.width = window.innerWidth / 2;
-    //this.canvas.height = window.innerHeight / 2;
-    this.canvas.width = window.innerWidth * 0.75;  //makes game window 60% of screen
+    this.canvas.width = window.innerWidth * 0.75;
     this.canvas.height = window.innerHeight * 0.75;
     this.canvas.style.position = 'absolute';
-    //this.canvas.width = window.innerWidth;   // makes game screen same size as window
-    //this.canvas.height = window.innerHeight; // makes game screen same size as window
-    this.canvas.style.top = '40%';  // moves game screen up/down
-    this.canvas.style.left = '50%'; // move game screeb left/right
+    this.canvas.style.top = '40%';
+    this.canvas.style.left = '50%';
     this.canvas.style.transform = 'translate(-50%, -50%)';
-    // image background
     this.canvas.style.background = 'url("sprites/background.jpg") no-repeat center center';
     this.canvas.style.backgroundSize = 'cover';
 
-    this.basket = { x: this.canvas.width / 2, y: this.canvas.height - 100, width: 100, height: 50 };
-    this.fruits = [];
-    this.grenades = [];
-    this.explosions = [];
-    this.splashes = [];
-    this.score = 0;
-    this.speed = 2;
-    this.gameOver = false;
+    // High score using localStorage
+    this.highScore = parseInt(localStorage.getItem('highScore')) || 0;
 
-    this.fruitImages = [
-      "sprites/blueberry.png", "sprites/cherry.png", "sprites/grape.png",
-      "sprites/green_apple.png", "sprites/orange.png", "sprites/pear.png",
-      "sprites/pepper.png", "sprites/pumpkin.png", "sprites/red_apple.png",
-      "sprites/strawberry.png", "sprites/tomato.png", "sprites/grenade.png"
-    ];
+    // Instantiate levels
+    this.level1 = new Level1(this);
+    this.level2 = new Level2(this);
+    this.currentLevel = this.level1; // Start with Level 1
 
-    this.fruitSound = new Audio('audios/pop.mp3');
-    this.grenadeSound = new Audio('audios/explosion.wav');
-    this.missSound = new Audio('audios/fruit_lost.mp3');
-    this.backgroundMusic = new Audio('audios/ShanghaiActionEnd.mp3');
-
-    this.basketImg = new Image();
-    this.basketImg.src = 'sprites/basket.png';
-
-    this.grenadeImg = new Image();
-    this.grenadeImg.src = 'sprites/grenade.png';
-
-    this.explosionImg = new Image();
-    this.explosionImg.src = 'sprites/explosion-sheet.png';
-
-    this.splashImg = new Image();
-    this.splashImg.src = 'sprites/splash.png';
-
-    this.setupEvents();
-    this.createRestartButton();
+    // Setup UI buttons and background music
+    this.setupUI();
     this.startBackgroundMusic();
-    this.gameLoop();
-  }
 
-  setupEvents() {
+    // Centralized mouse movement event for both levels:
     document.addEventListener('mousemove', (e) => {
       const rect = this.canvas.getBoundingClientRect();
-      this.basket.x = e.clientX - rect.left - this.basket.width / 2;
+      // Update player position if Level2; basket if Level1
+      if (this.currentLevel instanceof Level1) {
+        this.level1.basket.x = e.clientX - rect.left - this.level1.basket.width / 2;
+      } else if (this.currentLevel instanceof Level2) {
+        this.level2.player.x = e.clientX - rect.left - this.level2.player.width / 2;
+      }
     });
-  }
-
-  createRestartButton() {
-    const button = document.createElement('button');
-    button.innerText = 'New Game';
-    button.style.position = 'absolute';
-    button.style.top = '50%';   // moves "new game" up/down
-    button.style.left = '49%';  // moves "new game" left/right
-    button.style.transform = 'translate(-50%, -50%)';
-    button.style.padding = '10px 20px';
-    button.style.fontSize = '20px';
-    button.style.display = 'none';
-    button.id = 'restartButton';
-    document.body.appendChild(button);
-
-    button.addEventListener('click', () => {
-      this.resetGame();
-      button.style.display = 'none';
+    // Centralized click/space event for shooting arrows in Level2:
+    document.addEventListener('click', () => {
+      if (this.currentLevel instanceof Level2 && !this.currentLevel.gameOver) {
+        this.currentLevel.shootArrow();
+      }
     });
-  }
+    document.addEventListener('keydown', (e) => {
+      if (this.currentLevel instanceof Level2 && e.code === 'Space' && !this.currentLevel.gameOver) {
+        this.currentLevel.shootArrow();
+      }
+    });
 
-  showRestartButton() {
-    const button = document.getElementById('restartButton');
-    button.style.display = 'block';
-  }
-
-  resetGame() {
-    this.fruits = [];
-    this.grenades = [];
-    this.score = 0;
-    this.speed = 2;
-    this.gameOver = false;
-    this.backgroundMusic.currentTime = 0;
-    this.backgroundMusic.play();
+    // Begin game loop
     this.gameLoop();
+  }
+
+  setupUI() {
+    // Restart button for Game Over
+    this.restartButton = document.createElement('button');
+    this.restartButton.innerText = 'New Game';
+    this.restartButton.style.position = 'absolute';
+    this.restartButton.style.top = '75%';      // from 50
+    this.restartButton.style.left = '17.5%';  // from 49 
+    this.restartButton.style.transform = 'translate(-50%, -50%)';
+    this.restartButton.style.padding = '10px 20px';
+    this.restartButton.style.fontSize = '20px';
+    this.restartButton.style.display = 'none';
+    document.body.appendChild(this.restartButton);
+    this.restartButton.addEventListener('click', () => {
+      this.resetGame();
+      this.restartButton.style.display = 'none';
+    });
+
+    // Next Level button (from Level 1 to Level 2)
+    this.nextLevelButton = document.createElement('button');
+    this.nextLevelButton.innerText = 'Next Level';
+    this.nextLevelButton.style.position = 'absolute';
+    this.nextLevelButton.style.top = '75%';              // move "Next Level" up/down
+    this.nextLevelButton.style.left = '82.6%';
+    this.nextLevelButton.style.transform = 'translate(-50%, -50%)';
+    this.nextLevelButton.style.padding = '10px 20px';
+    this.nextLevelButton.style.fontSize = '20px';
+    this.nextLevelButton.style.display = 'none';
+    document.body.appendChild(this.nextLevelButton);
+    this.nextLevelButton.addEventListener('click', () => {
+      this.changeLevel(2);
+      this.nextLevelButton.style.display = 'none';
+    });
   }
 
   startBackgroundMusic() {
+    this.backgroundMusic = new Audio('audios/ShanghaiActionEnd  .mp3');
     this.backgroundMusic.loop = true;
     this.backgroundMusic.volume = 0.5;
     this.backgroundMusic.play();
   }
 
+  changeLevel(levelNumber) {
+    if (levelNumber === 1) {
+      this.currentLevel = this.level1;
+    } else if (levelNumber === 2) {
+      this.currentLevel = this.level2;
+    }
+  }
+
+  updateLeaderboard() {
+    if (this.currentLevel.score > this.highScore) {
+      this.highScore = this.currentLevel.score;
+      localStorage.setItem('highScore', this.highScore);
+    }
+    this.ctx.fillStyle = 'yellow';
+    this.ctx.font = '20px Arial';
+    this.ctx.fillText(`High Score: ${this.highScore}`, this.canvas.width - 200, 40);
+  }
+
+  resetGame() {
+    // Reset both levels
+    this.level1.reset();
+    this.level2.reset();
+    // Restart from Level 1
+    this.changeLevel(1);
+  }
+
+  showRestartButton() {
+    this.restartButton.style.display = 'block';
+  }
+
+  showNextLevelButton() {
+    this.nextLevelButton.style.display = 'block';
+  }
+
   gameLoop() {
-    if (this.gameOver) {
-      this.ctx.fillStyle = 'red';
-      this.ctx.font = '50px Arial';
-      this.ctx.fillText('Game Over!', this.canvas.width / 2 - 150, this.canvas.height / 2);
-      this.ctx.font = '30px Arial';
-      this.ctx.fillText(`Score: ${this.score}`, this.canvas.width / 2 - 80, this.canvas.height / 2 + 50);
-      this.showRestartButton();
-      return;
-    }
-
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    
-    this.drawBasket();
-    this.updateFruits();
-    this.updateGrenades();
-    this.updateExplosions();
-    this.updateSplashes();
-    this.updateSpeed();
-    this.updateScore();
-
+    // Delegate update and render to the current level
+    this.currentLevel.update();
+    this.currentLevel.render();
+    this.updateLeaderboard();
     requestAnimationFrame(() => this.gameLoop());
-  }
-
-  drawBasket() {
-    this.ctx.drawImage(this.basketImg, this.basket.x, this.basket.y, this.basket.width, this.basket.height);
-  }
-
-  updateFruits() {
-    if (Math.random() < 0.02) {
-      const fruitImage = new Image();
-      fruitImage.src = this.fruitImages[Math.floor(Math.random() * this.fruitImages.length)];
-      this.fruits.push({ x: Math.random() * this.canvas.width, y: 0, img: fruitImage });
-    }
-    this.fruits.forEach((fruit, index) => {
-      fruit.y += this.speed;
-      this.ctx.drawImage(fruit.img, fruit.x, fruit.y, 40, 40);
-
-      if (fruit.y + 40 > this.basket.y && fruit.x + 40 > this.basket.x && fruit.x < this.basket.x + this.basket.width) {
-        this.fruits.splice(index, 1);
-        this.score++;
-        this.fruitSound.play();
-      }
-
-      if (fruit.y > this.canvas.height) {
-        this.fruits.splice(index, 1);
-        this.splashes.push({ x: fruit.x, y: this.canvas.height - 40, frame: 0 });
-        this.missSound.play();
-      }
-    });
-  }
-
-  updateGrenades() {
-    if (Math.random() < 0.01) {
-      this.grenades.push({ x: Math.random() * this.canvas.width, y: 0 });
-    }
-    this.grenades.forEach((grenade, index) => {
-      grenade.y += this.speed;
-      this.ctx.drawImage(this.grenadeImg, grenade.x, grenade.y, 40, 40);
-      
-      if (grenade.y + 40 > this.basket.y && grenade.x + 40 > this.basket.x && grenade.x < this.basket.x + this.basket.width) {
-        this.grenadeSound.play();
-        this.explosions.push({ x: grenade.x, y: grenade.y, frame: 0 });
-        this.gameOver = true;
-      }
-      
-      if (grenade.y > this.canvas.height) {
-        this.grenades.splice(index, 1);
-      }
-    });
-  }
-
-  updateExplosions() {
-    this.explosions.forEach((explosion, index) => {
-      const frameSize = 44;
-      const totalFrames = 3;
-      this.ctx.drawImage(this.explosionImg, explosion.frame * frameSize, 0, frameSize, 48, explosion.x, explosion.y, 44, 48);
-      explosion.frame++;
-      if (explosion.frame >= totalFrames) {
-        this.explosions.splice(index, 1);
-      }
-    });
-  }
-  
-  updateSplashes() {
-    this.splashes.forEach((splash, index) => {
-      this.ctx.drawImage(this.splashImg, splash.x, splash.y, 50, 50);
-      splash.frame++;
-      if (splash.frame > 10) {
-        this.splashes.splice(index, 1);
-      }
-    });
-  }
-
-  updateSpeed() {
-    this.speed += 0.001;
-  }
-
-  updateScore() {
-    this.ctx.fillStyle = 'black';
-    this.ctx.font = '30px Arial';
-    this.ctx.fillText(`Score: ${this.score}`, 20, 40);
   }
 }
 
-new Game();
+
+
+
+
 
 
 

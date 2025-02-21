@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fruit Basket Game</title>
+  <title>Fruit Game with Levels</title>
   <style>
     body {
       margin: 0;
@@ -13,13 +13,8 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
+      /*background: #66b4e4;*/
     }
-    /*
-    canvas {
-      display: block;
-      background: #dff7e8;
-    }
-    */ 
     .game-info {
       text-align: center;
       margin-top: 700px;
@@ -32,19 +27,36 @@
   <canvas id="gameCanvas"></canvas>
   <div class="game-info">
     <p>
-      <strong>How to Play:</strong> 
-      Move the mouse to control the basket and catch the falling fruits. Avoid the grenades! 
-      If a grenade hits your basket, the game is over. 
+      <strong>How to Play:</strong>
+      <br /><em>Level 1:</em> 
+      Move the mouse to control the basket and catch falling fruits. You need atleast 20 fruit to advance. Avoid grenades!
+      <br /><em>Level 2:</em> 
+      Your basket becomes a player that shoots arrows at falling fruits. Missing 10 fruits or hitting 10 grenades causes you to lose (and restart at Level 1), while grenades kill you immediately. 
+      The bird is a power-up that slows things down (arrow can't hit it, get it yourself while avoiding grenades). 
+      Hold down "Space" to rain arrows or click to shoot it. 
     </p>
     <p>
-      <strong>Coming Next:</strong> 
-      I plan to add new power-ups, different game levels, and a scoring leaderboard to enhance the experience.
-      And also, I am thinking of turning the basket into a player that shoots arrows at the fruits.
+      <strong>Coming Next:</strong>
+      Adding more assets to it and a way to decreament fruits collect if missed on level 1. 
+      Make better transitions between levels.
     </p>
   </div>
+
   <script src="game.js"></script>
+  <script src="Level.js"></script>
+  <script src="Level1.js"></script>
+  <script src="Level2.js"></script>
+
+  <script>
+    // Initializing the Game
+    new Game();
+  </script>
+
 </body>
-</html>
+</html> 
+
+
+
 
 
 
