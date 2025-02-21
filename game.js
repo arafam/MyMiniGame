@@ -56,8 +56,8 @@ class Game {
     this.restartButton = document.createElement('button');
     this.restartButton.innerText = 'New Game';
     this.restartButton.style.position = 'absolute';
-    this.restartButton.style.top = '75%';      // from 50
-    this.restartButton.style.left = '17.5%';  // from 49 
+    this.restartButton.style.top = '75%'; // from 50
+    this.restartButton.style.left = '17.5%'; // from 49 
     this.restartButton.style.transform = 'translate(-50%, -50%)';
     this.restartButton.style.padding = '10px 20px';
     this.restartButton.style.fontSize = '20px';
@@ -72,7 +72,7 @@ class Game {
     this.nextLevelButton = document.createElement('button');
     this.nextLevelButton.innerText = 'Next Level';
     this.nextLevelButton.style.position = 'absolute';
-    this.nextLevelButton.style.top = '75%';              // move "Next Level" up/down
+    this.nextLevelButton.style.top = '75%'; // move "Next Level" up/down
     this.nextLevelButton.style.left = '82.6%';
     this.nextLevelButton.style.transform = 'translate(-50%, -50%)';
     this.nextLevelButton.style.padding = '10px 20px';
@@ -133,6 +133,22 @@ class Game {
     this.updateLeaderboard();
     requestAnimationFrame(() => this.gameLoop());
   }
+
+  // TO FIX WHY AUDIO DOESN'T PLAY
+  // Existing code unchanged.
+  window; onload = function () {
+    var context = new AudioContext();
+    // Setup all nodes
+    // ...
+  };
+  // One-liner to resume playback when user interacted with the page.
+  document; querySelector() { } addEventListener() { } function() {
+    context.resume().then(() => {
+      console.log('Playback resumed successfully');
+    });
+  };
+
+
 }
 
 
