@@ -8,52 +8,66 @@
     body {
       margin: 0;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      position: relative;
       height: 100vh;
-      /*background: #66b4e4;*/
+      background: #000;
     }
-    .game-info {
-      text-align: center;
-      margin-top: 700px;
-      font-size: 18px;
-      width: 60%;
+    /* How To Play Screen Styles */
+    #aboutScreen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      z-index: 1000;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+    #aboutScreen h2 {
+      margin-top: 0;
+    }
+    #aboutScreen button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <canvas id="gameCanvas"></canvas>
-  <div class="game-info">
+  
+  <!-- How To Play Screen -->
+  <div id="aboutScreen">
+    <h2>How to Play</h2>
     <p>
-      <strong>Click the screen to play the Audios. -- How to Play:</strong>
-      <br /><em>Level 1:</em> 
-      Move the mouse to control the basket and catch falling fruits. You need atleast 20 fruit to advance. Avoid grenades!
-      <br /><em>Level 2:</em> 
-      Your basket becomes a player that shoots arrows at falling fruits. Missing 10 fruits or hitting 10 grenades causes you to lose (and restart at Level 1), while grenades kill you immediately. 
-      The bird is a power-up that slows things down (arrow can't hit it, get it yourself while avoiding grenades). 
-      Hold down "Space" to rain arrows or click to shoot it. 
-    </p>
-    <p>
-      <strong>Coming Next:</strong>
-      Adding more assets to it and a way to decreament fruits collect if missed on level 1. 
-      Make better transitions between levels.
-    </p>
-  </div>
+      Click the screen to play the Audios.<br/><br/>
 
+      <strong>Level 1:</strong><br/> Move the mouse to control the basket and catch falling fruits. 
+      <br>You need at least 20 fruits to advance or keep playing to beat the "High Score" count.<br/> 
+      If you missed a fruit the count will decreament. Avoid grenades!<br/><br/>
+
+      <strong>Level 2:</strong><br/> Your basket becomes a player that shoots arrows at falling fruits. 
+      Missing 10 fruits or hitting 10 grenades causes you to lose (and restart at Level 1), while grenades kill you immediately. <br/> 
+      The bird is a power-up that slows things down (arrow can't hit it, get it yourself while avoiding grenades). <br/> 
+      Hold down "Space" to rain arrows or click to shoot it.<br/><br/>
+
+      <strong>Coming Next:</strong> Adding more assets and better level transitions.
+    </p>
+    <button id="closeAboutButton">Close</button>
+  </div>
   <script src="game.js"></script>
-  <script src="Level.js"></script>
+  <script src="transition.js"></script>
   <script src="Level1.js"></script>
   <script src="Level2.js"></script>
-
   <script>
-    // Initializing the Game
     new Game();
   </script>
-
 </body>
-</html> 
+</html>
 
 
 
