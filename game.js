@@ -109,6 +109,12 @@ class Game {
     this.audioControlsContainer.style.gap = '10px';
     document.body.appendChild(this.audioControlsContainer);
 
+    // Background Audio Label and Volume slider
+    let bgLabel = document.createElement('span');
+    bgLabel.innerText = 'Background Audio';
+    bgLabel.style.color = 'white';
+    this.audioControlsContainer.appendChild(bgLabel);
+
     // Background Music Volume slider
     this.volumeSlider = document.createElement('input');
     this.volumeSlider.type = 'range';
@@ -121,6 +127,12 @@ class Game {
       this.audioVolume = parseFloat(e.target.value);
       this.updateAudioVolume();
     });
+
+    // Sound Effects Audio Label and Volume slider
+    let sfxLabel = document.createElement('span');
+    sfxLabel.innerText = 'Sound Effect Audio';
+    sfxLabel.style.color = 'white';
+    this.audioControlsContainer.appendChild(sfxLabel);
 
     // Sound Effects Volume slider
     this.sfxSlider = document.createElement('input');
