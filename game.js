@@ -148,8 +148,8 @@ class Game {
     this.trackSelect = document.createElement('select');
     let tracks = [
       { name: 'Track 1', url: 'audios/ShanghaiActionEnd.mp3' },
-      { name: 'Track 2', url: 'audios/track2.mp3' },
-      { name: 'Track 3', url: 'audios/track3.mp3' }
+      { name: 'Track 2', url: 'audios/game-music.mp3' },
+      { name: 'Track 3', url: 'audios/8bit-music-game.mp3' }
     ];
     tracks.forEach(track => {
       let option = document.createElement('option');
