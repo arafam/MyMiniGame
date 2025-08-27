@@ -1,4 +1,5 @@
 
-Simple mini game I made for js class
+# Mini-Game
 
-https://arafam.github.io/MyMiniGame/
+This a simple mini game I made for js class to get extra credits and explore the game world.
+
